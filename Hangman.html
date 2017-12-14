@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div class="header">Hangman!</div>
+
+	<div class="header1">press a key to guess</div>
+	<div class="main">
+	<div>Wrong guesses: <div id="guessesid"></div></div>
+	<div>Your Guess:<span id="letterid"></span></div>
+	<div id="answerid"></div>
+	</div>
+
+
+
+
+<script type="text/javascript">
+	var key = ["bear","tent","trail","hiking","backpack","nature","mountain","appalachian"];
+	var selector = 0;
+	function game(){
+		var lives = 20;
+		var clear = document.getElementById("answerid");//when game runs, it clears the answerid element
+		while(clear.firstChild){
+    	clear.removeChild(clear.firstChild);
+		}
+
+		var clear1 = document.getElementById("guessesid");//when game runs, it clears the guessid element
+		while(clear1.firstChild){
+    	clear1.removeChild(clear1.firstChild);
+		}
+
+		var clear2 = document.getElementById("letterid");//when game runs, it clears the letterid element
+		while(clear2.firstChild){
+    	clear2.removeChild(clear2.firstChild);
+		}
+
+		var answer = key[selector]; //current answer
+
+		var guesses = [] //total guesses
+
+		var wrong = [] //wrong guesses
+
+		var correct = [] //correct guesses
+
+		var answerArray = answer.split("");
+
+		var noDuplicates = answerArray.reduce(function(a,b){//makes an array of the answer without duplicates
+		    if (a.indexOf(b) < 0 ) a.push(b);
+		    return a;
+		  },[]);
+
+    	for (var i = 0; i < answerArray.length; i++) {//puts _ for the number of letters in the word giving each _ a class of the letter it represents
+    	  var placeholder = document.createElement("span");
+       	  placeholder.classList.add(answerArray[i]);
+    	  placeholder.innerHTML = "_ ";
+    	  document.getElementById("answerid").append(placeholder);
+    	  };
+		
+		function win() { //if you win, add one to selector and play game with next word
+			selector = selector+1;
+			lives = lives-1;
+			alert("got it! can you get the next one? you have one less life this time");
+			game();
+		}
+
+		function lose() {//if you lose, alert and reload the page
+			alert("oops you ran out of lives, start over from the beginning!");
+			location.reload();
+		}
+
+		document.onkeypress = function(event) {//on a key press
+			var letter = event.key;
+
+			var selection = answer.indexOf(letter);
+
+			var guess = guesses.indexOf(letter);
+
+			if (guess === -1) { //if the guess hasnt already been guessed
+				guesses.push(letter);
+
+				document.getElementById("letterid").innerHTML = letter;//display which letter you just pressed
+
+    			if (selection === -1) { //and it is not in the answer take a life and add it to wrong
+    				wrong.push(letter);
+    				document.getElementById("guessesid").innerHTML = wrong;
+    				lives = lives-1;
+				}
+
+				else { //if it is in the answer grab the _'s with the id of the correct letter and replace them with the correct letter
+					var classname = document.getElementById("answerid").getElementsByClassName(letter);
+					for (var i = 0; i < classname.length; i++) {
+					classname[i].innerHTML = letter;
+					}
+					correct.push(letter);//also, push the letter you guessed correctly into an array
+				}
+			}	
+
+			if (lives == 0) {//if lives falls to 0 you lose
+				lose();
+			}
+
+			if (correct.length == noDuplicates.length) {//if you have guessed the correct number of letters for the answer, you win
+				win();
+			}
+		}
+}
+
+game()// run game at start
+
+
+</script>
+
+
+</body>
+</html>
